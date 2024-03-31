@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -89,6 +88,11 @@ namespace StinkySteak.Dirichlet.Numerics
             Create(out this, value);
         }
 
+        public UInt128(UInt128Simple value)
+        {
+            this = value.ToUInt128();
+        }
+
         public UInt128(ulong value)
         {
             Create(out this, value);
@@ -115,10 +119,26 @@ namespace StinkySteak.Dirichlet.Numerics
             c.S1 = (ulong)r3 << 32 | r2;
         }
 
+        public static UInt128 Create(uint r0, uint r1, uint r2, uint r3)
+        {
+            UInt128 c;
+            Create(out c, r0, r1, r2, r3);
+            return c;
+        }
+
         public static void Create(out UInt128 c, ulong S0, ulong S1)
         {
             c.S0 = S0;
             c.S1 = S1;
+        }
+
+        public static UInt128 Create(ulong S0, ulong S1)
+        {
+            UInt128 c;
+            c.S0 = S0;
+            c.S1 = S1;
+
+            return c;
         }
 
         public static void Create(out UInt128 c, long a)
@@ -176,10 +196,10 @@ namespace StinkySteak.Dirichlet.Numerics
                 Negate(ref c);
         }
 
-        private uint r0 { get { return (uint)S0; } }
-        private uint r1 { get { return (uint)(S0 >> 32); } }
-        private uint r2 { get { return (uint)S1; } }
-        private uint r3 { get { return (uint)(S1 >> 32); } }
+        public uint r0 { get { return (uint)S0; } }
+        public uint r1 { get { return (uint)(S0 >> 32); } }
+        public uint r2 { get { return (uint)S1; } }
+        public uint r3 { get { return (uint)(S1 >> 32); } }
 
 #if DIRICHLET_NEWTONSOFT
         [JsonIgnore]
@@ -194,8 +214,8 @@ namespace StinkySteak.Dirichlet.Numerics
         public readonly int Sign => IsZero ? 0 : 1;
 #else
         public readonly bool IsZero => (S0 | S1) == 0;
-        public readonly bool IsOne  => S1 == 0 && S0 == 1;
-        public readonly bool IsPowerOfTwo => (this & (this - 1)).IsZero; 
+        public readonly bool IsOne => S1 == 0 && S0 == 1;
+        public readonly bool IsPowerOfTwo => (this & (this - 1)).IsZero;
         public readonly bool IsEven => (S0 & 1) == 0;
         public readonly int Sign => IsZero ? 0 : 1;
 #endif
@@ -224,6 +244,11 @@ namespace StinkySteak.Dirichlet.Numerics
             UInt128 c;
             Create(out c, a);
             return c;
+        }
+
+        public static implicit operator UInt128(UInt128Simple a)
+        {
+            return a.ToUInt128();
         }
 
         public static explicit operator UInt128(sbyte a)
@@ -953,6 +978,14 @@ namespace StinkySteak.Dirichlet.Numerics
         {
             Multiply64(out c, a, b);
             Debug.Assert((BigInteger)c == (BigInteger)a * (BigInteger)b);
+        }
+
+        public static UInt128 Multiply(ulong a, ulong b)
+        {
+            UInt128 c;
+            Multiply64(out c, a, b);
+            Debug.Assert((BigInteger)c == (BigInteger)a * (BigInteger)b);
+            return c;
         }
 
         public static void Multiply(out UInt128 c, ref UInt128 a, uint b)
