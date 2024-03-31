@@ -1,11 +1,13 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
 
-namespace Dirichlet.Numerics
+namespace StinkySteak.Dirichlet.Numerics
 {
+    [Serializable]
     public struct UInt128 : IFormattable, IComparable, IComparable<UInt128>, IEquatable<UInt128>
     {
         private struct UInt256
@@ -179,14 +181,24 @@ namespace Dirichlet.Numerics
         private uint r2 { get { return (uint)S1; } }
         private uint r3 { get { return (uint)(S1 >> 32); } }
 
-        
-
-        public bool IsZero { get { return (S0 | S1) == 0; } }
-        public bool IsOne { get { return S1 == 0 && S0 == 1; } }
-        public bool IsPowerOfTwo { get { return (this & (this - 1)).IsZero; } }
-        public bool IsEven { get { return (S0 & 1) == 0; } }
-        public int Sign { get { return IsZero ? 0 : 1; } }
-
+#if DIRICHLET_NEWTONSOFT
+        [JsonIgnore]
+        public readonly bool IsZero => (S0 | S1) == 0;
+        [JsonIgnore]
+        public readonly bool IsOne => S1 == 0 && S0 == 1;
+        [JsonIgnore]
+        public readonly bool IsPowerOfTwo => (this & (this - 1)).IsZero; 
+        [JsonIgnore]
+        public readonly bool IsEven => (S0 & 1) == 0;
+        [JsonIgnore]
+        public readonly int Sign => IsZero ? 0 : 1;
+#else
+        public readonly bool IsZero => (S0 | S1) == 0;
+        public readonly bool IsOne  => S1 == 0 && S0 == 1;
+        public readonly bool IsPowerOfTwo => (this & (this - 1)).IsZero; 
+        public readonly bool IsEven => (S0 & 1) == 0;
+        public readonly int Sign => IsZero ? 0 : 1;
+#endif
         public override string ToString()
         {
             return ((BigInteger)this).ToString();

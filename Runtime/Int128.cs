@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
 using System.Numerics;
 
-namespace Dirichlet.Numerics
+namespace StinkySteak.Dirichlet.Numerics
 {
     public struct Int128 : IFormattable, IComparable, IComparable<Int128>, IEquatable<Int128>
     {
